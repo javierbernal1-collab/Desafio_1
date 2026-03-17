@@ -23,5 +23,12 @@ int main()
 
     crear_Tablero(tablero, alto, ancho);
 
+    inicializar_Tablero(tablero, alto, ancho / 8);
+
+    imprimir_Tablero(tablero, alto, ancho);
+
+    liberar_Tablero(tablero, alto);
+
+
     return 0;
 }

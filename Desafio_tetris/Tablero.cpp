@@ -22,5 +22,32 @@ void inicializar_Tablero(unsigned char** tablero, int alto, int bytesPorFila)
         }
     }
 }
+void imprimir_Tablero(unsigned char** tablero, int alto, int ancho)
+{
+    int bytesPorFila = ancho / 8;
 
+    for (int i = 0; i < alto; i++)
+    {
+        for (int j = 0; j < bytesPorFila; j++)
+        {
+            for (int bit = 7; bit >= 0; bit--)
+            {
+                if (tablero[i][j] & (1 << bit))
+                    cout << "#";
+                else
+                    cout << ".";
+            }
+        }
+        cout << endl;
+    }
+}
+void liberar_Tablero(unsigned char** tablero, int alto)
+{
+    for (int i = 0; i < alto; i++)
+    {
+        delete[] tablero[i];
+    }
+
+    delete[] tablero;
+}
 
