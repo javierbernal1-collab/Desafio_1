@@ -18,8 +18,7 @@ bool mover_Derecha(unsigned char** tablero, int alto, int ancho, unsigned char f
 {
     int nuevaColumna = columnaPieza + 1;
 
-    if(posicion_Valida(tablero, alto, ancho,
-                        forma, filaPieza, nuevaColumna))
+    if(posicion_Valida(tablero, alto, ancho, forma, filaPieza, nuevaColumna))
     {
         columnaPieza = nuevaColumna;
         return true;

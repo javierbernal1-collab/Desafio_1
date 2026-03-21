@@ -19,10 +19,10 @@ void inicializar_Tablero(unsigned char** tablero, int alto, int bytesPorFila)
         for(int j = 0; j < bytesPorFila; j++)
             tablero[i][j] = 0;
 }
+
 bool posicion_Valida(unsigned char** tablero, int alto, int ancho, unsigned char forma[4], int filaPieza, int columnaPieza)
 {
-    int bytesPorFila = ancho / 8;
-
+    (void) ancho;
     for(int i = 0; i < 4; i++)
     {
         if(forma[i] == 0)
@@ -33,16 +33,18 @@ bool posicion_Valida(unsigned char** tablero, int alto, int ancho, unsigned char
         if(filaTablero < 0 || filaTablero >= alto)
             return false;
 
-        unsigned char piezaDesplazada =
-            forma[i] >> columnaPieza;
-
-        if(columnaPieza < 0 || columnaPieza > ancho - 4)
-            return false;
-
-        for(int j = 0; j < bytesPorFila; j++)
+        for(int bit = 7; bit >= 0; bit--)
         {
-            if(tablero[filaTablero][j] & piezaDesplazada)
-                return false;
+            if(forma[i] & (1 << bit))
+            {
+                int bitFinal = bit - columnaPieza;
+
+                if(bitFinal < 0 || bitFinal > 7)
+                    return false;
+
+                if(tablero[filaTablero][0] & (1 << bitFinal))
+                    return false;
+            }
         }
     }
 
@@ -104,3 +106,27 @@ void liberar_Tablero(unsigned char** tablero, int alto)
 
     delete[] tablero;
 }
+void fijar_Pieza(unsigned char** tablero, int alto, int ancho, unsigned char forma[4], int filaPieza, int columnaPieza)
+{
+    int bytesPorFila = ancho / 8;
+
+    for(int i = 0; i < 4; i++)
+    {
+        if(forma[i] == 0)
+            continue;
+
+        int filaTablero = filaPieza + i;
+
+        if(filaTablero >= 0 && filaTablero < alto)
+        {
+            unsigned char piezaDesplazada =
+                forma[i] >> columnaPieza;
+
+            for(int j = 0; j < bytesPorFila; j++)
+            {
+                tablero[filaTablero][j] |= piezaDesplazada;
+            }
+        }
+    }
+}
+

@@ -54,7 +54,33 @@ int main()
             break;
 
         case 's':
-            mover_Abajo(tablero, alto, ancho, forma, filaPieza, columnaPieza);
+            if(!mover_Abajo(tablero, alto, ancho,
+                             forma, filaPieza, columnaPieza))
+            {
+                fijar_Pieza(tablero, alto, ancho,
+                            forma, filaPieza, columnaPieza);
+
+                filaPieza = 0;
+                columnaPieza = (ancho / 2) - 2;
+                rotacion = 0;
+                tipo = (tipo + 1) % 7;
+
+                generar_Pieza(forma, tipo, rotacion);
+
+                if(!posicion_Valida(tablero, alto, ancho,
+                                     forma, filaPieza, columnaPieza))
+                {
+                    system("cls");
+                    imprimir_Tablero(tablero, alto, ancho,
+                                     forma, filaPieza, columnaPieza);
+
+                    cout << " ===== GAME OVER ===== ";
+                    liberar_Tablero(tablero, alto);
+                    return 0;
+                }
+
+            }
+
             break;
 
         case 'w':
