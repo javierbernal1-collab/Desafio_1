@@ -11,6 +11,8 @@ bool posicion_Valida(unsigned char** tablero, int alto, int ancho, unsigned char
 
 void fijar_Pieza(unsigned char** tablero, int alto, int ancho, unsigned char forma[4], int filaPieza, int columnaPieza);
 
+void eliminar_Filas_Completas(unsigned char** tablero, int alto, int ancho);
+
 void liberar_Tablero(unsigned char** tablero, int alto);
 
 #endif

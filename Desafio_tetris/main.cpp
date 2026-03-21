@@ -9,13 +9,12 @@ int main()
 {
     int ancho, alto;
 
-    cout << "Ingrese ancho (multiplo de 8, minimo 8): ";
+    cout << "Ingrese ancho (minimo 8): ";
     cin >> ancho;
 
     cout << "Ingrese alto (minimo 8): ";
     cin >> alto;
-
-    if(ancho < 8 || alto < 8 || ancho % 8 != 0)
+    if (ancho < 8 || alto < 8 || ancho % 8 != 0)
     {
         cout << "Dimensiones invalidas." << endl;
         return 0;
@@ -54,11 +53,11 @@ int main()
             break;
 
         case 's':
-            if(!mover_Abajo(tablero, alto, ancho,
-                             forma, filaPieza, columnaPieza))
+            if(!mover_Abajo(tablero, alto, ancho, forma, filaPieza, columnaPieza))
             {
-                fijar_Pieza(tablero, alto, ancho,
-                            forma, filaPieza, columnaPieza);
+                fijar_Pieza(tablero, alto, ancho, forma, filaPieza, columnaPieza);
+
+                eliminar_Filas_Completas(tablero, alto, ancho);
 
                 filaPieza = 0;
                 columnaPieza = (ancho / 2) - 2;
@@ -67,12 +66,10 @@ int main()
 
                 generar_Pieza(forma, tipo, rotacion);
 
-                if(!posicion_Valida(tablero, alto, ancho,
-                                     forma, filaPieza, columnaPieza))
+                if(!posicion_Valida(tablero, alto, ancho, forma, filaPieza, columnaPieza))
                 {
                     system("cls");
-                    imprimir_Tablero(tablero, alto, ancho,
-                                     forma, filaPieza, columnaPieza);
+                    imprimir_Tablero(tablero, alto, ancho, forma, filaPieza, columnaPieza);
 
                     cout << " ===== GAME OVER ===== ";
                     liberar_Tablero(tablero, alto);

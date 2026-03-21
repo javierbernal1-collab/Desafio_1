@@ -20,9 +20,14 @@ void inicializar_Tablero(unsigned char** tablero, int alto, int bytesPorFila)
             tablero[i][j] = 0;
 }
 
-bool posicion_Valida(unsigned char** tablero, int alto, int ancho, unsigned char forma[4], int filaPieza, int columnaPieza)
+bool posicion_Valida(unsigned char** tablero,
+                     int alto,
+                     int ancho,
+                     unsigned char forma[4],
+                     int filaPieza,
+                     int columnaPieza)
 {
-    (void) ancho;
+
     for(int i = 0; i < 4; i++)
     {
         if(forma[i] == 0)
@@ -37,12 +42,21 @@ bool posicion_Valida(unsigned char** tablero, int alto, int ancho, unsigned char
         {
             if(forma[i] & (1 << bit))
             {
-                int bitFinal = bit - columnaPieza;
+                int columnaGlobal =
+                    (7 - bit) + columnaPieza;
 
-                if(bitFinal < 0 || bitFinal > 7)
+                if(columnaGlobal < 0 ||
+                    columnaGlobal >= ancho)
                     return false;
 
-                if(tablero[filaTablero][0] & (1 << bitFinal))
+                int byteIndex =
+                    columnaGlobal / 8;
+
+                int bitIndex =
+                    7 - (columnaGlobal % 8);
+
+                if(tablero[filaTablero][byteIndex] &
+                    (1 << bitIndex))
                     return false;
             }
         }
@@ -59,43 +73,54 @@ void imprimir_Tablero(unsigned char** tablero, int alto, int ancho, unsigned cha
     {
         cout << "|";
 
-        for(int j = 0; j < bytesPorFila; j++)
+        for(int col = 0; col < ancho; col++)
         {
-            for(int bit = 7; bit >= 0; bit--)
+            bool ocupado = false;
+
+            int byteIndex = col / 8;
+            int bitIndex  = 7 - (col % 8);
+
+
+            if(tablero[i][byteIndex] & (1 << bitIndex))
+                ocupado = true;
+
+
+            int filaRelativa = i - filaPieza;
+
+            if(filaRelativa >= 0 && filaRelativa < 4)
             {
-                bool ocupado = false;
-
-
-                if(tablero[i][j] & (1 << bit))
-                    ocupado = true;
-
-
-                int filaRelativa = i - filaPieza;
-
-                if(filaRelativa >= 0 && filaRelativa < 4)
+                for(int bit = 7; bit >= 0; bit--)
                 {
-                    int bitPieza = bit + columnaPieza;
+                    if(forma[filaRelativa] & (1 << bit))
+                    {
+                        int columnaGlobal =
+                            (7 - bit) + columnaPieza;
 
-                    if(bitPieza >= 0 && bitPieza < 8)
-                        if(forma[filaRelativa] & (1 << bitPieza))
+                        if(columnaGlobal == col)
                             ocupado = true;
+                    }
                 }
+            }
 
                 if(ocupado)
                     cout << "#";
                 else
                     cout << ".";
-            }
         }
 
         cout << "|" << endl;
     }
+        cout << " ";
+        for(int i = 0; i < ancho * 2; i++)
+            cout << "-";
+        cout << endl;
 
+        cout << "Accion: [A]Izq [D]Der [S]Bajar [W]Rotar [Q]Salir\n";
 
-    cout << " ";
-    for(int i = 0; i < ancho; i++)
-        cout << "--";
-    cout << endl;
+        cout << " ";
+        for(int i = 0; i < ancho; i++)
+            cout << "--";
+        cout << endl;
 
 }
 
@@ -106,9 +131,14 @@ void liberar_Tablero(unsigned char** tablero, int alto)
 
     delete[] tablero;
 }
-void fijar_Pieza(unsigned char** tablero, int alto, int ancho, unsigned char forma[4], int filaPieza, int columnaPieza)
+
+void fijar_Pieza(unsigned char** tablero,
+                 int alto,
+                 int ancho,
+                 unsigned char forma[4],
+                 int filaPieza,
+                 int columnaPieza)
 {
-    int bytesPorFila = ancho / 8;
 
     for(int i = 0; i < 4; i++)
     {
@@ -119,14 +149,59 @@ void fijar_Pieza(unsigned char** tablero, int alto, int ancho, unsigned char for
 
         if(filaTablero >= 0 && filaTablero < alto)
         {
-            unsigned char piezaDesplazada =
-                forma[i] >> columnaPieza;
-
-            for(int j = 0; j < bytesPorFila; j++)
+            for(int bit = 7; bit >= 0; bit--)
             {
-                tablero[filaTablero][j] |= piezaDesplazada;
+                if(forma[i] & (1 << bit))
+                {
+                    int columnaGlobal =
+                        (7 - bit) + columnaPieza;
+
+                    if(columnaGlobal >= 0 &&
+                        columnaGlobal < ancho)
+                    {
+                        int byteIndex =
+                            columnaGlobal / 8;
+
+                        int bitIndex =
+                            7 - (columnaGlobal % 8);
+
+                        tablero[filaTablero][byteIndex] |=
+                            (1 << bitIndex);
+                    }
+                }
             }
         }
     }
 }
+void eliminar_Filas_Completas(unsigned char** tablero,
+                              int alto,
+                              int ancho)
+{
+    int bytesPorFila = ancho / 8;
 
+    for(int i = 0; i < alto; i++)
+    {
+        bool completa = true;
+
+        for(int j = 0; j < bytesPorFila; j++)
+        {
+            if(tablero[i][j] != 255)
+            {
+                completa = false;
+                break;
+            }
+        }
+
+        if(completa)
+        {
+            for(int k = i; k > 0; k--)
+            {
+                for(int j = 0; j < bytesPorFila; j++)
+                    tablero[k][j] = tablero[k-1][j];
+            }
+
+            for(int j = 0; j < bytesPorFila; j++)
+                tablero[0][j] = 0;
+        }
+    }
+}
